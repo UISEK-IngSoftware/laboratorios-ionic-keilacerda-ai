@@ -2,9 +2,9 @@
 
 ## Información del Estudiante
 
-- **Nombre:** [Tu nombre completo aquí]
-- **Carrera:** [Tu carrera]
-- **Fecha de inicio:** [Fecha]
+- **Nombre:** Keila Cerda
+- **Carrera:** Ingeniería de Software
+- **Fecha de inicio:** 4 de junio de 2026
 
 ---
 
