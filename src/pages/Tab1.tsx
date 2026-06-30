@@ -1,8 +1,26 @@
-import { IonContent, IonHeader, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import React from 'react';
+import { IonContent, IonHeader, IonList, IonPage, IonTitle, IonToolbar, useIonViewWillEnter } from '@ionic/react';
 import './Tab1.css';
+import { Repository } from '../interfaces/Repository';
+import { fetchRepositories } from '../services/GithubService';
 import RepoItem from '../components/RepoItem';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const Tab1: React.FC = () => {
+  const [repos, setRepos] = React.useState<Repository[]>([]);
+  const [loading, setLoading] = React.useState(false);
+
+  const loadRepositories = async () => {
+    setLoading(true);
+    const reposData = await fetchRepositories();
+    setRepos(reposData);
+    setLoading(false);
+  };
+
+  useIonViewWillEnter(() => {
+    loadRepositories();
+  });
+
   return (
     <IonPage>
       <IonHeader>
@@ -16,39 +34,26 @@ const Tab1: React.FC = () => {
             <IonTitle size="large">Repositorios</IonTitle>
           </IonToolbar>
         </IonHeader>
-        
-        <IonList>
-          <RepoItem
-            name="Repositorio 1"
-            description="Descripción del repositorio 1"
-            language="JavaScript"
-            avatarUrl="https://avatars.githubusercontent.com/u/236501073?v=4&size=64"
-          />
-          <RepoItem
-            name="Repositorio 2"
-            description="Descripción del repositorio 2"
-            language="Python"
-            avatarUrl="https://avatars.githubusercontent.com/u/236501073?v=4&size=64"
-          />
-          <RepoItem
-            name="Repositorio 3"
-            description="Descripción del repositorio 3"
-            language="Java"
-            avatarUrl="https://avatars.githubusercontent.com/u/236501073?v=4&size=64"
-          />
-          <RepoItem
-            name="Repositorio 4"
-            description="Descripción del repositorio 4"
-            language="JavaScript"
-            avatarUrl="https://avatars.githubusercontent.com/u/236501073?v=4&size=64"
-          />
-        </IonList>
-
-
-
+        {!loading && repos.length > 0 && (
+          <IonList>
+            {repos.map((repo) => (
+              <RepoItem key={repo.id} {...repo} />
+            ))}
+          </IonList>
+        )}
+        <LoadingSpinner isOpen={loading} />
+        {!loading && repos.length === 0 && (
+          <div>
+            <p>No se econtraron repositorios</p>
+          </div>
+        )}
       </IonContent>
     </IonPage>
   );
 };
 
 export default Tab1;
+function userIonViewWillEnter(arg0: () => void) {
+  throw new Error('Function not implemented.');
+}
+
