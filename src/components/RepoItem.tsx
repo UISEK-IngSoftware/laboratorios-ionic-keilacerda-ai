@@ -20,7 +20,7 @@ const RepoItem: React.FC<Repository> = (repository) => {
         </IonItem>
 
             <IonItemOptions>
-              <IonItemOption>
+              <IonItemOption color="primary">
                 <IonIcon icon={pencilOutline} slot="icon-only"/>
               </IonItemOption>
               <IonItemOption color="danger">

@@ -53,7 +53,4 @@ const Tab1: React.FC = () => {
 };
 
 export default Tab1;
-function userIonViewWillEnter(arg0: () => void) {
-  throw new Error('Function not implemented.');
-}
 
