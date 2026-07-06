@@ -11,9 +11,12 @@ import {
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { addCircle, logoGithub, personCircle, } from 'ionicons/icons';
+
+import AuthService from './services/AuthService';
 import Tab1 from './pages/Tab1';
 import Tab2 from './pages/Tab2';
 import Tab3 from './pages/Tab3';
+import Login from "./pages/Login";
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -45,12 +48,22 @@ import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 
+
 setupIonicReact();
 
-const App: React.FC = () => (
+const App: React.FC = () => {
+  const isAuthenticated = AuthService.isAuthenticated();
+  return (
   <IonApp>
     <IonReactRouter>
-      <IonTabs>
+      <IonRouterOutlet>
+        <Route exact path="/login">
+        <Login />
+        </Route>
+        <Route>
+          
+        {isAuthenticated ? (
+        <IonTabs>
         <IonRouterOutlet>
           <Route exact path="/tab1">
             <Tab1 />
@@ -80,8 +93,15 @@ const App: React.FC = () => (
           </IonTabButton>
         </IonTabBar>
       </IonTabs>
+      ) : (
+        <Redirect to="/login" />
+      )}
+        </Route>
+      </IonRouterOutlet>
+      
     </IonReactRouter>
   </IonApp>
 );
+};
 
 export default App;
