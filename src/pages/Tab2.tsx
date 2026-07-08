@@ -1,27 +1,36 @@
 import { IonButton, IonContent, IonHeader, IonInput, IonPage, IonText, IonTextarea, IonTitle, IonToolbar, useIonViewWillEnter } from '@ionic/react';
 import './Tab2.css';
-import { useHistory } from 'react-router';
+import { useHistory, useLocation } from 'react-router';
 import { RepositoryPayload } from '../interfaces/RepositoryPayload';
-import { createRepository } from '../services/GithubService';
-import React from 'react';
+import { createRepository, updateRepository } from '../services/GithubService';
+import { Repository } from '../interfaces/Repository';
+import React, { useEffect, useState} from 'react';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Tab2: React.FC = () => {
   const history = useHistory();
+  const location = useLocation<{ repository?: Repository }>();
+  const editingRepository = location.state?.repository;
   const [loading, setLoading] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState("");
   
-  const repoFormData: RepositoryPayload = {
+  const [repoFormData, setRepoFormData] = useState<RepositoryPayload>({
     name: '',
     description: '',
-  };
+  });
 
   const setFormName = (value: string) => {
-    repoFormData.name = value;
+    setRepoFormData((prev) => ({
+      ...prev,
+      name: value,
+    }));
   };
 
   const setFormDescription = (value: string) => {
-    repoFormData.description = value;
+    setRepoFormData((prev) => ({
+      ...prev,
+      description: value,
+    }));
   };
 
   const saveRepository = () => {
@@ -30,22 +39,46 @@ const Tab2: React.FC = () => {
       return;
     }
     setLoading(true);
-    createRepository(repoFormData).then((newRepo) => {
-      if (newRepo) {
-        setFormName('');
-        setFormDescription('');
+    console.log("Modo edición:", editingRepository);
+    console.log("Datos enviados:", repoFormData);
+
+    const action = editingRepository? updateRepository(
+      editingRepository.owner.login,
+      editingRepository.name,
+      repoFormData
+    ): createRepository(repoFormData);
+    action .then((repo) => {
+
+      if (repo) {
+        setRepoFormData({
+          name: '',
+          description: '',
+        });
         history.push('/tab1');
       }
     }).catch((error) => {
-      setErrorMsg("Error al crear el repositorio." + error.message);
+      setErrorMsg(error.message);
     }).finally(() => {
       setLoading(false);
     });
-  }
+  };
 
   useIonViewWillEnter(() => {
     setErrorMsg("");
   });
+    
+  useEffect(() => {
+    if (editingRepository) {
+      setRepoFormData({
+        name: editingRepository.name,
+        description: editingRepository.description || "",
+      });
+    } else {
+      setRepoFormData({
+        name: "",
+      });
+    }
+  }, [editingRepository]);
 
   return (
     <IonPage>
@@ -90,7 +123,7 @@ const Tab2: React.FC = () => {
             fill="solid"
             onClick={saveRepository}
           >
-            Guardar
+            {editingRepository ? "Actualizar" : "Guardar"}
           </IonButton>
         </div>
         <LoadingSpinner isOpen={loading} />

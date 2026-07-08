@@ -34,8 +34,33 @@ export const createRepository = async (repository: RepositoryPayload): Promise<R
     try {
         const response = await githubApiClient.post("/user/repos", repository);
         return response.data as Repository;
-    }catch (error) {
+    } catch (error) {
         throw new Error("Error creando repositorio: " + error);
+    }
+};
+
+export const updateRepository = async (
+    owner: string,
+    repo: string,
+    repository: RepositoryPayload
+): Promise<Repository | null> => {
+    try {
+        const response = await githubApiClient.patch(`/repos/${owner}/${repo}`, repository);
+        return response.data as Repository;
+    } catch (error) {
+        throw new Error("Error actualizando repositorio: " + error);
+    }
+};
+
+export const deleteRepository = async (
+    owner: string,
+    repo: string
+): Promise<boolean> => {
+    try {
+        await githubApiClient.delete(`/repos/${owner}/${repo}`);
+        return true;
+    } catch (error) {
+        throw new Error("Error obteniendo información del usuario: " + error);
     }
 };
 
@@ -46,4 +71,4 @@ export const getUserInfo = async (): Promise<GithubUser | null> => {
     } catch (error) {
         throw new Error("Error obteniendo información del usuario: " + error);
     }
-}
+};

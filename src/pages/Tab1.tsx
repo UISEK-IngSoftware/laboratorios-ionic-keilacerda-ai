@@ -2,7 +2,7 @@ import React from 'react';
 import { IonContent, IonHeader, IonList, IonPage, IonText, IonTitle, IonToolbar, useIonViewWillEnter } from '@ionic/react';
 import './Tab1.css';
 import { Repository } from '../interfaces/Repository';
-import { fetchRepositories } from '../services/GithubService';
+import { fetchRepositories, deleteRepository, } from '../services/GithubService';
 import RepoItem from '../components/RepoItem';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -17,6 +17,23 @@ const Tab1: React.FC = () => {
     .then((reposData) => setRepos(reposData))
     .catch((error) => setErrorMsg(error.message))
     .finally(() => setLoading(false));
+  };
+
+  const handleDeleteRepository = async (repository: Repository) => {
+    try {
+      setLoading(true); await deleteRepository(
+        repository.owner.login,
+        repository.name
+      ); await loadRepositories();
+    } catch (error) {
+  if (error instanceof Error) {
+    setErrorMsg(error.message);
+  } else {
+    setErrorMsg("Ocurrió un error al eliminar el repositorio.");
+  }
+} finally {
+      setLoading(false);
+    }
   };
 
   useIonViewWillEnter(() => {
@@ -39,7 +56,7 @@ const Tab1: React.FC = () => {
         {!loading && repos.length > 0 && (
           <IonList>
             {repos.map((repo) => (
-              <RepoItem key={repo.id} {...repo} />
+              <RepoItem key={repo.id} {...repo} onDelete={handleDeleteRepository} />
             ))}
           </IonList>
         )}
